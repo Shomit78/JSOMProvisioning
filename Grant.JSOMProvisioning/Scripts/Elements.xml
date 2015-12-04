@@ -6,5 +6,8 @@
     <File Path="Scripts\jquery-1.9.1.min.js" Url="Scripts/jquery-1.9.1.min.js" ReplaceContent="TRUE" />
     <File Path="Scripts\jquery-1.9.1.js" Url="Scripts/jquery-1.9.1.js" ReplaceContent="TRUE" />
     <File Path="Scripts\jquery-1.9.1.intellisense.js" Url="Scripts/jquery-1.9.1.intellisense.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\Namespace.js" Url="Scripts/Namespace.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\Provision.js" Url="Scripts/Provision.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\Store.js" Url="Scripts/Store.js" ReplaceContent="TRUE" />
   </Module>
 </Elements>
