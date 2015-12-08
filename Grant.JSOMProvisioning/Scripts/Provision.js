@@ -32,9 +32,55 @@ provisioning.Manager = function (hostWebUrl, appWebUrl) {
     var publicMembers = {
         createSiteColumnText: function (name, displayName, description, required, group) {
             var fieldSchema = '<Field Type="Text" Name="' + name + '" DisplayName="' +
-                displayName + '" Description="' + description + '" Required="' + required + '" Group="' + group + '" />';
+                displayName + '" Description="' + description + '" Required="' + required + '" Group="' + group +
+                '" SourceID="http://schemas.microsoft.com/sharepoint/v3" />';
             createSiteColumn(fieldSchema).then(function () {
                 console.info("Text site column created: " + displayName);
+            });
+        },
+        createSiteColumnNumber: function (name, displayName, description, max, min, decimals, required, group) {
+            var fieldSchema = "";
+            if ((max != null) || (min != null) || (decimals != null)) {
+                fieldSchema += '<Field Type="Number" Name="' + name + '" DisplayName="' +
+                    displayName + '" Description="' + description + '" Max="' + max + '" Min="' + min + '" Decimals="' + decimals + '" Required="' +
+                    required + '" Group="' + group + '" SourceID="http://schemas.microsoft.com/sharepoint/v3" />';
+            }
+            else {
+                fieldSchema += '<Field Type="Number" Name="' + name + '" DisplayName="' +
+                    displayName + '" Description="' + description + '" Required="' +
+                    required + '" Group="' + group + '" SourceID="http://schemas.microsoft.com/sharepoint/v3" />';
+            }
+            createSiteColumn(fieldSchema).then(function () {
+                console.info("Number site column created: " + displayName);
+            });
+        },
+        createSiteColumnUrl: function (name, displayName, description, required, group) {
+            var fieldSchema = '<Field Type="URL" Format="Hyperlink" Name="' + name + '" DisplayName="' +
+                displayName + '" Description="' + description + '" Required="' + required + '" Group="' + group +
+                '" SourceID="http://schemas.microsoft.com/sharepoint/v3" />';
+            createSiteColumn(fieldSchema).then(function () {
+                console.info("Hyperlink site column created: " + displayName);
+            });
+        },
+        createSiteColumnImage: function (name, displayName, description, required, group) {
+            var fieldSchema = '<Field Type="URL" Format="Image" Name="' + name + '" DisplayName="' +
+                displayName + '" Description="' + description + '" Required="' + required + '" Group="' + group +
+                '" SourceID="http://schemas.microsoft.com/sharepoint/v3" />';
+            createSiteColumn(fieldSchema).then(function () {
+                console.info("Picture site column created: " + displayName);
+            });
+        },
+        createSiteColumnDropDown: function (name, displayName, description, choices, required, group) {
+            var fieldSchema = '<Field Type="Choice" Format="Dropdown" Name="' + name + '" DisplayName="' +
+                displayName + '" Description="' + description + '" Required="' + required + '" Group="' + group +
+                '" SourceID="http://schemas.microsoft.com/sharepoint/v3" ><CHOICES>';
+            for (var i = 0; i < choices.length; i++) {
+                console.log(choices[i]);
+                fieldSchema += "<CHOICE>" + choices[i] + "</CHOICE>";
+            }
+            fieldSchema += "</CHOICES></Field>";
+            createSiteColumn(fieldSchema).then(function () {
+                console.info("Dropdown site column created: " + displayName);
             });
         },
         deleteSiteColumn: function (siteColumnDisplayName) {

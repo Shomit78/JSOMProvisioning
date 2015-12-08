@@ -16,11 +16,33 @@ $(document).ready(function () {
     $('#btnProvision').click(function () {
         provisionManager.createSiteColumnText(siteColumns.SimpleTextColumn.Name,
             siteColumns.SimpleTextColumn.DisplayName, siteColumns.SimpleTextColumn.Description, siteColumns.SimpleTextColumn.Required, siteColumns.groupName);
+        provisionManager.createSiteColumnNumber(siteColumns.NumberColumn.Name,
+            siteColumns.NumberColumn.DisplayName, siteColumns.NumberColumn.Description, siteColumns.NumberColumn.Max,
+            siteColumns.NumberColumn.Min, siteColumns.NumberColumn.Decimals, siteColumns.NumberColumn.Required, siteColumns.groupName);
+        provisionManager.createSiteColumnUrl(siteColumns.UrlColumn.Name,
+            siteColumns.UrlColumn.DisplayName, siteColumns.UrlColumn.Description, siteColumns.UrlColumn.Required, siteColumns.groupName);
+        provisionManager.createSiteColumnImage(siteColumns.ImageColumn.Name,
+            siteColumns.ImageColumn.DisplayName, siteColumns.ImageColumn.Description, siteColumns.ImageColumn.Required, siteColumns.groupName);
+        provisionManager.createSiteColumnDropDown(siteColumns.DropDownColumn.Name,
+            siteColumns.DropDownColumn.DisplayName, siteColumns.DropDownColumn.Description, siteColumns.DropDownColumn.Choices,
+            siteColumns.DropDownColumn.Required, siteColumns.groupName);
     });
 
     $('#btnUnprovision').click(function () {
         provisionManager.deleteSiteColumn(siteColumns.SimpleTextColumn.DisplayName).then(function () {
-            console.info("site column deleted");
+            console.info("site column deleted: " + siteColumns.SimpleTextColumn.DisplayName);
+        });
+        provisionManager.deleteSiteColumn(siteColumns.NumberColumn.DisplayName).then(function () {
+            console.info("site column deleted: " + siteColumns.NumberColumn.DisplayName);
+        });
+        provisionManager.deleteSiteColumn(siteColumns.UrlColumn.DisplayName).then(function () {
+            console.info("site column deleted: " + siteColumns.UrlColumn.DisplayName);
+        });
+        provisionManager.deleteSiteColumn(siteColumns.ImageColumn.DisplayName).then(function () {
+            console.info("site column deleted: " + siteColumns.ImageColumn.DisplayName);
+        });
+        provisionManager.deleteSiteColumn(siteColumns.DropDownColumn.DisplayName).then(function () {
+            console.info("site column deleted: " + siteColumns.DropDownColumn.DisplayName);
         });
     });
 });
