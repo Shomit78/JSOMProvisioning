@@ -90,7 +90,6 @@ provisioning.Manager = function (hostWebUrl, appWebUrl) {
                 displayName + '" Description="' + description + '" Required="' + required + '" Group="' + group +
                 '" SourceID="http://schemas.microsoft.com/sharepoint/v3" ><CHOICES>';
             for (var i = 0; i < choices.length; i++) {
-                console.log(choices[i]);
                 fieldSchema += "<CHOICE>" + choices[i] + "</CHOICE>";
             }
             fieldSchema += "</CHOICES></Field>";
@@ -108,6 +107,7 @@ provisioning.Manager = function (hostWebUrl, appWebUrl) {
             field.deleteObject();
 
             ctx.executeQueryAsync(function () {
+                console.log("Deleted site column: " + siteColumnDisplayName);
                 dfd.resolve();
             }, function (sender, args) {
                 console.log("Site column deletion failure: " + siteColumnDisplayName + " - " + args.get_message());
@@ -123,13 +123,16 @@ provisioning.Manager = function (hostWebUrl, appWebUrl) {
             var appctx = getAppContextSite(ctx);
 
             var targetWeb = appctx.get_site().get_rootWeb();
-            var fields = targetWeb.get_fields()
-            var fieldLinks = {};
-            ctx.load(fields);
-            for (var i = 0; i < siteColumnNames.length; i++) {
-                var field = fields.getByInternalNameOrTitle(siteColumnNames[i]);
-                ctx.load(field);
-                $(fieldLinks).push(field);
+            if (siteColumnNames.length > 0) {
+                var fields = targetWeb.get_fields()
+                var field = new Array();
+                var fieldLinks = new Array();
+                ctx.load(fields);
+                for (var i = 0; i < siteColumnNames.length; i++) {
+                    field[i] = fields.getByInternalNameOrTitle(siteColumnNames[i]);
+                    ctx.load(field[i]);
+                    fieldLinks.push(field[i]);
+                }
             }
             var ctci = constructCTCI(contentTypeId, contentTypeName)
             var newType = targetWeb.get_contentTypes().add(ctci);
@@ -141,16 +144,28 @@ provisioning.Manager = function (hostWebUrl, appWebUrl) {
                 ctx.load(fieldRefs);
                 ctx.executeQueryAsync(
                     function () {
-                        for (var i = 0; i < fieldLinks.length; i++) {
-                            var flci = constructFLCI(fieldLinks[i]);
-                            newType.get_fieldLinks().add(flci);
+                        console.log("Created site content type: ", contentTypeName);
+                        if (siteColumnNames.length > 0) {
+                            for (var i = 0; i < fieldLinks.length; i++) {
+                                var flci = constructFLCI(fieldLinks[i]);
+                                newType.get_fieldLinks().add(flci);
+                            }
+                            newType.update();
+
+                            ctx.executeQueryAsync(function () {
+                                if (siteColumnNames.length > 0) {
+                                    for (var i = 0; i < siteColumnNames.length; i++) {
+                                        console.log("Added site column to " + contentTypeName + " content type: " + siteColumnNames[i]);
+                                    }
+                                }
+                                dfd.resolve();
+                            },
+                                function (sender, args) {
+                                    console.log("Content type creation failure: " + args.get_message());
+                                    dfd.reject();
+                                });
                         }
-                        newType.update();
-                        ctx.executeQueryAsync(function () { dfd.resolve(); },
-                            function (sender, args) {
-                                console.log("Content type creation failure: " + args.get_message());
-                                dfd.reject();
-                            });
+                        console.log("Completed creating site content type:" + contentTypeName);
                     },
                     function (sender, args) {
                         console.log("Content type creation failure: " + args.get_message());
@@ -175,7 +190,10 @@ provisioning.Manager = function (hostWebUrl, appWebUrl) {
             var targetType = webTypes.getById(contentTypeId)
             targetType.deleteObject();
             ctx.executeQueryAsync(succeed, fail);
-            function succeed() { dfd.resolve(); }
+            function succeed() {
+                console.log("Deleted content type: " + contentTypeId);
+                dfd.resolve();
+            }
             function fail(sender, args) {
                 console.log("Content type deletion failure: " + args.get_message());
                 dfd.reject();
