@@ -34,6 +34,12 @@ provisioning.Manager = function (hostWebUrl, appWebUrl) {
         flci.set_field(targetField);
         return flci;
     }
+    function constructLCI(listName) {
+        var lci = new SP.ListCreationInformation();
+        lci.set_title(listName);
+        lci.set_templateType(SP.ListTemplateType.genericList);
+        return lci;
+    }
     var publicMembers = {
         createSiteColumn:  function(xmlFieldSchema) {
             var dfd = $.Deferred();
@@ -198,6 +204,71 @@ provisioning.Manager = function (hostWebUrl, appWebUrl) {
                 console.log("Content type deletion failure: " + args.get_message());
                 dfd.reject();
             }
+            return dfd.promise();
+        },
+        createCustomList: function (listName, contentTypeId) {
+            var dfd = $.Deferred();
+
+            var ctx = getContext();
+            var appctx = getAppContextSite(ctx);
+
+            var targetType = appctx.get_site().get_rootWeb().get_contentTypes().getById(contentTypeId);
+            var thisWeb = appctx.get_web();
+            ctx.load(thisWeb);
+            ctx.load(targetType);
+            ctx.executeQueryAsync(
+                function () {
+                    var targetWeb = appctx.get_site().get_rootWeb();
+                    var lci = constructLCI(listName);
+                    var newList = targetWeb.get_lists().add(lci);
+                    newList.set_contentTypesEnabled(true);
+                    var listTypes = newList.get_contentTypes();
+                    ctx.load(newList);
+                    ctx.load(listTypes);
+
+                    ctx.executeQueryAsync(
+                        function () {
+                            listTypes.addExistingContentType(targetType);
+                            newList.update();
+                            ctx.executeQueryAsync(function () { dfd.resolve() }, function (sender, args) {
+                                console.log("Generic list creation failure: " + args.get_message());
+                                dfd.reject()
+                            });
+                        },
+                        function (sender, args) {
+                            console.log("Generic list creation failure: " + args.get_message());
+                            dfd.reject();
+                        });
+                },
+                function (sender, args) {
+                    console.log("Document library creation failure: " + args.get_message());
+                    dfd.reject();
+                });
+            return dfd.promise();
+        },
+        deleteCustomList: function (listName) {
+            var dfd = $.Deferred();
+
+            var ctx = getContext();
+            var appctx = getAppContextSite(ctx);
+
+            var thisWeb = appctx.get_web();
+            ctx.load(thisWeb);
+            ctx.executeQueryAsync(
+                function () {
+                    var targetWeb = appctx.get_site().get_rootWeb();
+                    var targetList = targetWeb.get_lists().getByTitle(listName);
+                    targetList.deleteObject();
+
+                    ctx.executeQueryAsync(function () { dfd.resolve(); }, function (sender, args) {
+                        console.log("List deletion failure: " + args.get_message());
+                        dfd.reject();
+                    });
+                },
+                function (sender, args) {
+                    console.log("List deletion failure: " + args.get_message());
+                    dfd.reject();
+                });
             return dfd.promise();
         }
         //Create list

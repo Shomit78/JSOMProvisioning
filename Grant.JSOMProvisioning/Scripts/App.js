@@ -18,23 +18,32 @@ $(document).ready(function () {
         provisionManager.createSiteColumn(provisionManager.createSiteColumnTextFieldXml(siteColumns.SimpleTextColumn.Name,
             siteColumns.SimpleTextColumn.DisplayName, siteColumns.SimpleTextColumn.Description,
             siteColumns.SimpleTextColumn.Required, siteColumns.groupName)).then(function () {
+                console.log("Created site column: " + siteColumns.SimpleTextColumn.DisplayName);
                 provisionManager.createSiteColumn(provisionManager.createSiteColumnNumberFieldXml(siteColumns.NumberColumn.Name,
                     siteColumns.NumberColumn.DisplayName, siteColumns.NumberColumn.Description, siteColumns.NumberColumn.Max,
                     siteColumns.NumberColumn.Min, siteColumns.NumberColumn.Decimals,
                     siteColumns.NumberColumn.Required, siteColumns.groupName)).then(function () {
+                        console.log("Created site column: " + siteColumns.NumberColumn.DisplayName);
                         provisionManager.createSiteColumn(provisionManager.createSiteColumnUrlFieldXml(siteColumns.UrlColumn.Name,
                             siteColumns.UrlColumn.DisplayName, siteColumns.UrlColumn.Description,
                             siteColumns.UrlColumn.Required, siteColumns.groupName)).then(function () {
+                                console.log("Created site column: " + siteColumns.UrlColumn.DisplayName);
                                 provisionManager.createSiteColumn(provisionManager.createSiteColumnImageFieldXml(siteColumns.ImageColumn.Name,
                                     siteColumns.ImageColumn.DisplayName, siteColumns.ImageColumn.Description,
                                     siteColumns.ImageColumn.Required, siteColumns.groupName)).then(function () {
+                                        console.log("Created site column: " + siteColumns.ImageColumn.DisplayName);
                                         provisionManager.createSiteColumn(provisionManager.createSiteColumnDropDownFieldXml(siteColumns.DropDownColumn.Name,
                                             siteColumns.DropDownColumn.DisplayName, siteColumns.DropDownColumn.Description, siteColumns.DropDownColumn.Choices,
                                             siteColumns.DropDownColumn.Required, siteColumns.groupName)).then(function () {
-                                            }).then(function () {
+                                                console.log("Created site column: " + siteColumns.DropDownColumn.DisplayName);
                                                 provisionManager.createSiteContentType(siteContentTypes.contentType.Id,
                                                     siteContentTypes.contentType.Name, siteContentTypes.groupName,
-                                                    siteContentTypes.contentType.Description, siteContentTypes.contentType.Columns);
+                                                    siteContentTypes.contentType.Description, siteContentTypes.contentType.Columns).then(function () {
+                                                        console.log("Created content type: " + siteContentTypes.contentType.Name);
+                                                        provisionManager.createCustomList("JSOM Custom List", siteContentTypes.contentType.Id).then(function () {
+                                                            console.log("Created custom list");
+                                                        });
+                                                    });
                                             });
                                     });
                             });
@@ -43,17 +52,20 @@ $(document).ready(function () {
     });
 
     $('#btnUnprovision').click(function () {
-        provisionManager.deleteSiteContentType(siteContentTypes.contentType.Id).then(function () {
-            provisionManager.deleteSiteColumn(siteColumns.SimpleTextColumn.DisplayName).then(function () {
-            console.info("site column deleted: " + siteColumns.SimpleTextColumn.DisplayName);
-                provisionManager.deleteSiteColumn(siteColumns.NumberColumn.DisplayName).then(function () {
-                    console.info("site column deleted: " + siteColumns.NumberColumn.DisplayName);
-                    provisionManager.deleteSiteColumn(siteColumns.UrlColumn.DisplayName).then(function () {
-                        console.info("site column deleted: " + siteColumns.UrlColumn.DisplayName);
-                        provisionManager.deleteSiteColumn(siteColumns.ImageColumn.DisplayName).then(function () {
-                            console.info("site column deleted: " + siteColumns.ImageColumn.DisplayName);
-                            provisionManager.deleteSiteColumn(siteColumns.DropDownColumn.DisplayName).then(function () {
-                                console.info("site column deleted: " + siteColumns.DropDownColumn.DisplayName);
+        provisionManager.deleteCustomList("JSOM Custom List").then(function () {
+            console.log("Deleted custom list");
+            provisionManager.deleteSiteContentType(siteContentTypes.contentType.Id).then(function () {
+                provisionManager.deleteSiteColumn(siteColumns.SimpleTextColumn.DisplayName).then(function () {
+                    console.info("site column deleted: " + siteColumns.SimpleTextColumn.DisplayName);
+                    provisionManager.deleteSiteColumn(siteColumns.NumberColumn.DisplayName).then(function () {
+                        console.info("site column deleted: " + siteColumns.NumberColumn.DisplayName);
+                        provisionManager.deleteSiteColumn(siteColumns.UrlColumn.DisplayName).then(function () {
+                            console.info("site column deleted: " + siteColumns.UrlColumn.DisplayName);
+                            provisionManager.deleteSiteColumn(siteColumns.ImageColumn.DisplayName).then(function () {
+                                console.info("site column deleted: " + siteColumns.ImageColumn.DisplayName);
+                                provisionManager.deleteSiteColumn(siteColumns.DropDownColumn.DisplayName).then(function () {
+                                    console.info("site column deleted: " + siteColumns.DropDownColumn.DisplayName);
+                                });
                             });
                         });
                     });
